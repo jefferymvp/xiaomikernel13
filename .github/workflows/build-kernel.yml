@@ -29,6 +29,8 @@ jobs:
   build:
     name: Build Kernel for ${{ github.event.inputs.device || 'umi' }}
     runs-on: ubuntu-22.04
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout Kernel Source
