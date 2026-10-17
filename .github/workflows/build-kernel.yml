@@ -88,10 +88,13 @@ jobs:
           git clone --depth=1 https://github.com/osm0sis/AnyKernel3.git anykernel
 
           # Configure anykernel.sh for Xiaomi 10 / SM8250 devices
+          sed -i 's/kernel.string=.*/kernel.string=Xiaomi 10 Bypass Charging Kernel/g' anykernel/anykernel.sh
           sed -i 's/device.name1=.*/device.name1=umi/g' anykernel/anykernel.sh
           sed -i 's/device.name2=.*/device.name2=cmi/g' anykernel/anykernel.sh
           sed -i 's/device.name3=.*/device.name3=cas/g' anykernel/anykernel.sh
           sed -i 's/device.name4=.*/device.name4=thyme/g' anykernel/anykernel.sh
+          sed -i -E 's|^(BLOCK|block)=.*|\1=boot;|g' anykernel/anykernel.sh
+          sed -i -E 's|^(IS_SLOT_DEVICE|is_slot_device)=.*|\1=auto;|g' anykernel/anykernel.sh
 
           # Copy built Image
           cp out/arch/arm64/boot/Image anykernel/
