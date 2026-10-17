@@ -59,7 +59,10 @@ jobs:
           DEVICE="${{ github.event.inputs.device || 'umi' }}"
           echo "Configuring kernel for device: $DEVICE"
           mkdir -p out
-          make O=out ARCH=arm64 vendor/kona-perf_defconfig vendor/xiaomi/sm8250-common.config vendor/xiaomi/${DEVICE}.config
+          ARCH=arm64 ./scripts/kconfig/merge_config.sh -O out \
+            arch/arm64/configs/vendor/kona-perf_defconfig \
+            arch/arm64/configs/vendor/xiaomi/sm8250-common.config \
+            arch/arm64/configs/vendor/xiaomi/${DEVICE}.config
 
       - name: Compile Kernel
         run: |
@@ -98,11 +101,8 @@ jobs:
           sed -i 's|^IS_SLOT_DEVICE=.*|IS_SLOT_DEVICE=auto;|g' anykernel/anykernel.sh
           sed -i 's|^is_slot_device=.*|is_slot_device=auto;|g' anykernel/anykernel.sh
 
-          # Copy built Image
+          # Copy built Image (AnyKernel3 will unpack original boot.img and replace Image, preserving the device's native official dtb)
           cp out/arch/arm64/boot/Image anykernel/
-
-          # Copy dtb if generated
-          find out/arch/arm64/boot/dts/vendor/qcom -name "*.dtb" -exec cp {} anykernel/dtb \; 2>/dev/null || true
 
           cd anykernel
           BUILD_DATE=$(date +'%Y%m%d_%H%M%S')
