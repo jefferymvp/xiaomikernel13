@@ -59,10 +59,15 @@ jobs:
           DEVICE="${{ github.event.inputs.device || 'umi' }}"
           echo "Configuring kernel for device: $DEVICE"
           mkdir -p out
-          ARCH=arm64 ./scripts/kconfig/merge_config.sh -O out \
-            arch/arm64/configs/vendor/kona-perf_defconfig \
-            arch/arm64/configs/vendor/xiaomi/sm8250-common.config \
-            arch/arm64/configs/vendor/xiaomi/${DEVICE}.config
+          if [ -f "arch/arm64/configs/vendor/xiaomi/hyperos_${DEVICE}_defconfig" ]; then
+            echo "Using official HyperOS extracted defconfig: hyperos_${DEVICE}_defconfig"
+            make O=out ARCH=arm64 vendor/xiaomi/hyperos_${DEVICE}_defconfig
+          else
+            ARCH=arm64 ./scripts/kconfig/merge_config.sh -O out \
+              arch/arm64/configs/vendor/kona-perf_defconfig \
+              arch/arm64/configs/vendor/xiaomi/sm8250-common.config \
+              arch/arm64/configs/vendor/xiaomi/${DEVICE}.config
+          fi
 
       - name: Compile Kernel
         run: |
